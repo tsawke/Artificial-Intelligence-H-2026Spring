@@ -1,0 +1,230 @@
+{
+  "task1": {
+    "split": {
+      "test_size": 0.2,
+      "random_state": 123,
+      "stratified": true
+    },
+    "single_models": [
+      {
+        "name": "mlp512_s123",
+        "hidden_layers": [
+          512
+        ],
+        "seed": 123,
+        "validation_accuracy": 0.5495198079231692,
+        "seconds": 30.33012366294861
+      },
+      {
+        "name": "mlp512_s456",
+        "hidden_layers": [
+          512
+        ],
+        "seed": 456,
+        "validation_accuracy": 0.5445178071228491,
+        "seconds": 29.730608701705933
+      },
+      {
+        "name": "mlp512_s789",
+        "hidden_layers": [
+          512
+        ],
+        "seed": 789,
+        "validation_accuracy": 0.5436174469787916,
+        "seconds": 26.880746126174927
+      },
+      {
+        "name": "mlp512_s2026",
+        "hidden_layers": [
+          512
+        ],
+        "seed": 2026,
+        "validation_accuracy": 0.5434173669467787,
+        "seconds": 29.205184936523438
+      },
+      {
+        "name": "mlp256_s123",
+        "hidden_layers": [
+          256
+        ],
+        "seed": 123,
+        "validation_accuracy": 0.5341136454581833,
+        "seconds": 10.516949892044067
+      },
+      {
+        "name": "mlp256_s456",
+        "hidden_layers": [
+          256
+        ],
+        "seed": 456,
+        "validation_accuracy": 0.5384153661464586,
+        "seconds": 10.052741527557373
+      },
+      {
+        "name": "mlp512_256_s123",
+        "hidden_layers": [
+          512,
+          256
+        ],
+        "seed": 123,
+        "validation_accuracy": 0.5337134853941576,
+        "seconds": 1190.258165359497
+      },
+      {
+        "name": "mlp512_256_s456",
+        "hidden_layers": [
+          512,
+          256
+        ],
+        "seed": 456,
+        "validation_accuracy": 0.526110444177671,
+        "seconds": 40.12083721160889
+      }
+    ],
+    "ensemble_curve": [
+      {
+        "models": 1,
+        "last_model": "mlp512_s123",
+        "validation_accuracy": 0.5495198079231692
+      },
+      {
+        "models": 2,
+        "last_model": "mlp512_s456",
+        "validation_accuracy": 0.5673269307723089
+      },
+      {
+        "models": 3,
+        "last_model": "mlp512_s789",
+        "validation_accuracy": 0.5748299319727891
+      },
+      {
+        "models": 4,
+        "last_model": "mlp512_s2026",
+        "validation_accuracy": 0.5806322529011605
+      },
+      {
+        "models": 5,
+        "last_model": "mlp256_s123",
+        "validation_accuracy": 0.5841336534613846
+      },
+      {
+        "models": 6,
+        "last_model": "mlp256_s456",
+        "validation_accuracy": 0.5852340936374549
+      },
+      {
+        "models": 7,
+        "last_model": "mlp512_256_s123",
+        "validation_accuracy": 0.5848339335734294
+      },
+      {
+        "models": 8,
+        "last_model": "mlp512_256_s456",
+        "validation_accuracy": 0.587735094037615
+      }
+    ],
+    "final_validation_accuracy": 0.587735094037615
+  },
+  "interface_validation": {
+    "task1": {
+      "smoke_samples": 128,
+      "prediction_shape": [
+        128
+      ]
+    },
+    "task2": {
+      "smoke_queries": 64,
+      "output_shape": [
+        64,
+        5
+      ]
+    },
+    "task3": {
+      "selected_features": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        24,
+        26,
+        28,
+        29,
+        42,
+        46,
+        47,
+        59,
+        62,
+        71,
+        120,
+        130,
+        221
+      ],
+      "selected_count": 30,
+      "validation_accuracy": 0.4645858343337335,
+      "random_seed_42_accuracy": 0.16486594637855143
+    }
+  },
+  "task3": {
+    "selected_features": [
+      0,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      9,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      19,
+      20,
+      24,
+      26,
+      28,
+      29,
+      42,
+      46,
+      47,
+      59,
+      62,
+      71,
+      120,
+      130,
+      221
+    ],
+    "selected_count": 30,
+    "validation_accuracy": 0.4645858343337335,
+    "random_seed_42_accuracy": 0.16486594637855143
+  },
+  "task2_proxy": {
+    "simple": {
+      "raw": 0.0986,
+      "standardized": 0.10016,
+      "cosine": 0.0986,
+      "standardized_cosine": 0.09972
+    },
+    "selected_metric": {
+      "name": "standardized_euclidean",
+      "same_class_top5": 0.10016,
+      "raw_baseline_same_class_top5": 0.0986
+    }
+  }
+}
