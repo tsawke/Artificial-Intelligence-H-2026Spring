@@ -26,7 +26,6 @@ class Retrieval:
     # Transform candidate thresholds.
     RATIO_REPLACE = 1.00
     RATIO_REPLACE_BLUR_VS_TOP1 = 0.30
-    STRONG_TRANSFORM_RATIO = 0.50
     TASK_TIME_LIMIT_SEC = 600.0
     SAFETY_MARGIN_SEC = 5.0
     NEXT_CHUNK_GUARD_FACTOR = 1.25
@@ -229,8 +228,7 @@ class Retrieval:
         b_r = np.where(blur_ok, blur_ratio, BIG)
         stacked = np.stack([s_r, d_r, b_r], axis=1)  # [n, 3]
         channel = np.argmin(stacked, axis=1)
-        best_ratio = np.min(stacked, axis=1)
-        any_eligible = best_ratio < BIG
+        any_eligible = np.min(stacked, axis=1) < BIG
 
         cand_idx = np.where(
             channel == 0,
@@ -242,10 +240,8 @@ class Retrieval:
         semantic_prob = self._semantic_probabilities_from_raw_dist(raw_dist)
         if semantic_prob is None:
             out = self._ordered_topk(std_dist, self.k)
-            predicted_for_transform = None
         else:
             out = self._semantic_rerank(raw_dist, std_dist, raw_top, semantic_prob)
-            predicted_for_transform = self.semantic_classes[np.argmax(semantic_prob, axis=1)]
         out = self._preserve_exact_self(out, std_dist, self_idx_per_row)
         for i in range(n):
             if self_idx_per_row[i] >= 0:
@@ -253,10 +249,6 @@ class Retrieval:
             if not any_eligible[i]:
                 continue
             ci = int(cand_idx[i])
-            if predicted_for_transform is not None and self.repository_labels is not None:
-                same_predicted_class = self.repository_labels[ci] == predicted_for_transform[i]
-                if not same_predicted_class and best_ratio[i] > self.STRONG_TRANSFORM_RATIO:
-                    continue
             if ci in out[i, : k - 1]:
                 continue
             # Replace only the last slot to keep the output conservative.

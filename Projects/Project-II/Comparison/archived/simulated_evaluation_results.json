@@ -1,0 +1,122 @@
+{
+  "notes": [
+    "Single-submission OJ-style simulation for current oj_submission after time-guard changes.",
+    "Task 1 uses stratified 80/20 holdout; Task 2 uses local proxy because hidden relevance is unavailable; Task 3 uses public validation/model procedure."
+  ],
+  "task1_baseline": {
+    "strong_softmax_proxy_accuracy": 0.506202480992397,
+    "seconds": 3.0521230697631836
+  },
+  "task2_baseline": {
+    "raw_same_class_proxy": 0.10859375,
+    "raw_transform_top5_recall": {
+      "shift_right_1": 0.0859375,
+      "shift_down_1": 0.0078125,
+      "rotate_90": 0.0,
+      "blur": 0.1328125
+    }
+  },
+  "task3_baseline": {
+    "random_seed_42_accuracy": 0.16486594637855143
+  },
+  "submissions": {
+    "oj_submission": {
+      "path": "D:\\workspace\\Artificial-Intelligence-H-2026Spring\\Projects\\Project-II\\oj_submission",
+      "python_file_sizes": {
+        "classifier.py": 9566,
+        "retrieval.py": 14280,
+        "selector.py": 1182
+      },
+      "total_python_size": 25028,
+      "compliance_warning": null,
+      "task1": {
+        "accuracy": 0.5926370548219287,
+        "beats_baseline": true,
+        "init_seconds": 322.79751539230347,
+        "inference_seconds": 2.731328010559082,
+        "prediction_shape": [
+          9996
+        ]
+      },
+      "task2": {
+        "same_class_proxy": 0.109375,
+        "beats_raw_same_class_proxy": true,
+        "transform_top5_recall": {
+          "shift_right_1": 0.99609375,
+          "shift_down_1": 0.98828125,
+          "rotate_90": 1.0,
+          "blur": 1.0
+        },
+        "beats_raw_transform_baseline": {
+          "shift_right_1": true,
+          "shift_down_1": true,
+          "rotate_90": true,
+          "blur": true
+        },
+        "init_seconds": 0.03559255599975586,
+        "self_query_seconds": 0.4553525447845459,
+        "estimated_1000_query_seconds": 1.7787208780646324,
+        "transform_seconds": {
+          "shift_right_1": 0.4494507312774658,
+          "shift_down_1": 0.4354839324951172,
+          "rotate_90": 0.4493904113769531,
+          "blur": 0.4331223964691162
+        },
+        "output_shape": [
+          256,
+          5
+        ],
+        "valid_row_indices": true
+      },
+      "task3": {
+        "accuracy": 0.4658863545418167,
+        "beats_random_baseline": true,
+        "mask_shape": [
+          1,
+          256
+        ],
+        "mask_sum": 30.0,
+        "is_binary": true,
+        "selected_features": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          9,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          19,
+          20,
+          24,
+          26,
+          28,
+          29,
+          33,
+          46,
+          47,
+          54,
+          59,
+          62,
+          67,
+          71,
+          205
+        ],
+        "init_seconds": 0.0
+      },
+      "local_rubric_simulation": {
+        "task1_pass": true,
+        "task2_pass_proxy": true,
+        "task3_pass": true,
+        "all_three_pass_proxy": true
+      }
+    }
+  }
+}

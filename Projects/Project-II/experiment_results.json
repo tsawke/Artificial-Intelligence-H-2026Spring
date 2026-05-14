@@ -1,145 +1,88 @@
 {
-  "task1": {
-    "split": {
-      "test_size": 0.2,
-      "random_state": 123,
-      "stratified": true
-    },
-    "single_models": [
-      {
-        "name": "mlp512_s123",
-        "hidden_layers": [
-          512
-        ],
-        "seed": 123,
-        "validation_accuracy": 0.5495198079231692,
-        "seconds": 30.33012366294861
-      },
-      {
-        "name": "mlp512_s456",
-        "hidden_layers": [
-          512
-        ],
-        "seed": 456,
-        "validation_accuracy": 0.5445178071228491,
-        "seconds": 29.730608701705933
-      },
-      {
-        "name": "mlp512_s789",
-        "hidden_layers": [
-          512
-        ],
-        "seed": 789,
-        "validation_accuracy": 0.5436174469787916,
-        "seconds": 26.880746126174927
-      },
-      {
-        "name": "mlp512_s2026",
-        "hidden_layers": [
-          512
-        ],
-        "seed": 2026,
-        "validation_accuracy": 0.5434173669467787,
-        "seconds": 29.205184936523438
-      },
-      {
-        "name": "mlp256_s123",
-        "hidden_layers": [
-          256
-        ],
-        "seed": 123,
-        "validation_accuracy": 0.5341136454581833,
-        "seconds": 10.516949892044067
-      },
-      {
-        "name": "mlp256_s456",
-        "hidden_layers": [
-          256
-        ],
-        "seed": 456,
-        "validation_accuracy": 0.5384153661464586,
-        "seconds": 10.052741527557373
-      },
-      {
-        "name": "mlp512_256_s123",
-        "hidden_layers": [
-          512,
-          256
-        ],
-        "seed": 123,
-        "validation_accuracy": 0.5337134853941576,
-        "seconds": 1190.258165359497
-      },
-      {
-        "name": "mlp512_256_s456",
-        "hidden_layers": [
-          512,
-          256
-        ],
-        "seed": 456,
-        "validation_accuracy": 0.526110444177671,
-        "seconds": 40.12083721160889
-      }
-    ],
-    "ensemble_curve": [
-      {
-        "models": 1,
-        "last_model": "mlp512_s123",
-        "validation_accuracy": 0.5495198079231692
-      },
-      {
-        "models": 2,
-        "last_model": "mlp512_s456",
-        "validation_accuracy": 0.5673269307723089
-      },
-      {
-        "models": 3,
-        "last_model": "mlp512_s789",
-        "validation_accuracy": 0.5748299319727891
-      },
-      {
-        "models": 4,
-        "last_model": "mlp512_s2026",
-        "validation_accuracy": 0.5806322529011605
-      },
-      {
-        "models": 5,
-        "last_model": "mlp256_s123",
-        "validation_accuracy": 0.5841336534613846
-      },
-      {
-        "models": 6,
-        "last_model": "mlp256_s456",
-        "validation_accuracy": 0.5852340936374549
-      },
-      {
-        "models": 7,
-        "last_model": "mlp512_256_s123",
-        "validation_accuracy": 0.5848339335734294
-      },
-      {
-        "models": 8,
-        "last_model": "mlp512_256_s456",
-        "validation_accuracy": 0.587735094037615
-      }
-    ],
-    "final_validation_accuracy": 0.587735094037615
+  "environment_note": {
+    "validation_python": "C:\\Users\\Tsawke\\.conda\\envs\\ai-h\\python.exe",
+    "local_python_version": "3.10.20",
+    "local_sklearn_version": "1.7.2",
+    "target_project_sklearn_version": "1.5.2",
+    "compatibility_note": "Submitted code uses APIs available in scikit-learn 1.5.2; no pretrained model artifacts are required."
   },
-  "interface_validation": {
+  "evaluation_notes": [
+    "Single-submission OJ-style simulation for current oj_submission after time-guard changes.",
+    "Task 1 uses stratified 80/20 holdout; Task 2 uses local proxy because hidden relevance is unavailable; Task 3 uses public validation/model procedure."
+  ],
+  "task1_baseline": {
+    "strong_softmax_proxy_accuracy": 0.506202480992397,
+    "seconds": 3.0521230697631836
+  },
+  "task2_baseline": {
+    "raw_same_class_proxy": 0.10859375,
+    "raw_transform_top5_recall": {
+      "shift_right_1": 0.0859375,
+      "shift_down_1": 0.0078125,
+      "rotate_90": 0.0,
+      "blur": 0.1328125
+    }
+  },
+  "task3_baseline": {
+    "random_seed_42_accuracy": 0.16486594637855143
+  },
+  "oj_submission": {
+    "path": "D:\\workspace\\Artificial-Intelligence-H-2026Spring\\Projects\\Project-II\\oj_submission",
+    "python_file_sizes": {
+      "classifier.py": 9566,
+      "retrieval.py": 14280,
+      "selector.py": 1182
+    },
+    "total_python_size": 25028,
+    "compliance_warning": null,
     "task1": {
-      "smoke_samples": 128,
+      "accuracy": 0.5926370548219287,
+      "beats_baseline": true,
+      "init_seconds": 322.79751539230347,
+      "inference_seconds": 2.731328010559082,
       "prediction_shape": [
-        128
+        9996
       ]
     },
     "task2": {
-      "smoke_queries": 64,
+      "same_class_proxy": 0.109375,
+      "beats_raw_same_class_proxy": true,
+      "transform_top5_recall": {
+        "shift_right_1": 0.99609375,
+        "shift_down_1": 0.98828125,
+        "rotate_90": 1.0,
+        "blur": 1.0
+      },
+      "beats_raw_transform_baseline": {
+        "shift_right_1": true,
+        "shift_down_1": true,
+        "rotate_90": true,
+        "blur": true
+      },
+      "init_seconds": 0.03559255599975586,
+      "self_query_seconds": 0.4553525447845459,
+      "estimated_1000_query_seconds": 1.7787208780646324,
+      "transform_seconds": {
+        "shift_right_1": 0.4494507312774658,
+        "shift_down_1": 0.4354839324951172,
+        "rotate_90": 0.4493904113769531,
+        "blur": 0.4331223964691162
+      },
       "output_shape": [
-        64,
+        256,
         5
-      ]
+      ],
+      "valid_row_indices": true
     },
     "task3": {
+      "accuracy": 0.4658863545418167,
+      "beats_random_baseline": true,
+      "mask_shape": [
+        1,
+        256
+      ],
+      "mask_sum": 30.0,
+      "is_binary": true,
       "selected_features": [
         0,
         2,
@@ -162,23 +105,41 @@
         26,
         28,
         29,
-        42,
+        33,
         46,
         47,
+        54,
         59,
         62,
+        67,
         71,
-        120,
-        130,
-        221
+        205
       ],
-      "selected_count": 30,
-      "validation_accuracy": 0.4645858343337335,
-      "random_seed_42_accuracy": 0.16486594637855143
+      "init_seconds": 0.0
+    },
+    "local_rubric_simulation": {
+      "task1_pass": true,
+      "task2_pass_proxy": true,
+      "task3_pass": true,
+      "all_three_pass_proxy": true
     }
   },
-  "task3": {
-    "selected_features": [
+  "final_summary": {
+    "task1_pass": true,
+    "task1_holdout_accuracy": 0.5926370548219287,
+    "task1_init_seconds": 322.79751539230347,
+    "task1_inference_seconds": 2.731328010559082,
+    "task2_pass_proxy": true,
+    "task2_same_class_proxy": 0.109375,
+    "task2_transform_top5_recall": {
+      "shift_right_1": 0.99609375,
+      "shift_down_1": 0.98828125,
+      "rotate_90": 1.0,
+      "blur": 1.0
+    },
+    "task3_pass": true,
+    "task3_validation_accuracy": 0.4658863545418167,
+    "task3_selected_features": [
       0,
       2,
       3,
@@ -200,31 +161,19 @@
       26,
       28,
       29,
-      42,
+      33,
       46,
       47,
+      54,
       59,
       62,
+      67,
       71,
-      120,
-      130,
-      221
+      205
     ],
-    "selected_count": 30,
-    "validation_accuracy": 0.4645858343337335,
-    "random_seed_42_accuracy": 0.16486594637855143
-  },
-  "task2_proxy": {
-    "simple": {
-      "raw": 0.0986,
-      "standardized": 0.10016,
-      "cosine": 0.0986,
-      "standardized_cosine": 0.09972
-    },
-    "selected_metric": {
-      "name": "standardized_euclidean",
-      "same_class_top5": 0.10016,
-      "raw_baseline_same_class_top5": 0.0986
-    }
+    "all_three_pass_local_proxy": true,
+    "total_python_size": 25028,
+    "compliance_warning": null,
+    "time_guard_note": "Task 1 stops adding ensemble members if the soft deadline becomes risky; Task 2 falls back to raw top-5 for remaining chunks near deadline; Task 3 returns a fixed validated mask immediately."
   }
 }

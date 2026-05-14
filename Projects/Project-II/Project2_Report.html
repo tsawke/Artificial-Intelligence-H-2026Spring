@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
-  <title>CS303 Project 2 Report</title>
+  <title>Project2_Report</title>
   <style>
     /* Default styles provided by pandoc.
     ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -169,253 +169,297 @@
       vertical-align: middle;
     }
   </style>
+  <script
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
 </head>
 <body>
-<header id="title-block-header">
-<h1 class="title">CS303 Project 2 Report</h1>
-</header>
 <h1 id="cs303-project-2-report">CS303 Project 2 Report</h1>
 <h2 id="subtask-1-image-classification">Subtask 1: Image
 Classification</h2>
 <h3 id="introduction">1. Introduction</h3>
 <p>The first subtask is a supervised image-vector classification
-problem. Each image is already represented as a 256-dimensional feature
-vector, and the goal is to infer one of ten class labels for unseen test
-samples.</p>
-<p>The provided baseline is Softmax Regression. A linear classifier is
-efficient, but its decision boundary is limited to linear class
-separation in the feature space. My method uses an ensemble of
-multilayer perceptrons (MLPs) to model nonlinear feature interactions
-while preserving a simple submitted inference interface.</p>
+problem. Each image is represented as a 256-dimensional vector, and the
+goal is to predict one of ten class labels for unseen test samples.</p>
+<p>The baseline is Softmax Regression. I use a nonlinear ensemble that
+is still fully OJ-compliant: the submitted <code>Classifier</code> reads
+the judge-provided training pickle files, trains in
+<code>Classifier.__init__</code>, and stores no pretrained sidecar
+weights. The implementation also includes a soft time guard so that, on
+a slower judge machine, it can stop adding ensemble members and still
+return predictions from the best model set trained so far.</p>
 <h3 id="methodology">2. Methodology</h3>
-<p>Let the normalized input be</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>x</mi><mo accent="true">̃</mo></mover><mo>=</mo><mfrac><mrow><mi>x</mi><mo>−</mo><mi>μ</mi></mrow><mi>σ</mi></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
-\tilde{x} = \frac{x-\mu}{\sigma}.
-</annotation></semantics></math></p>
-<p>For each MLP model, hidden layers use the ReLU activation</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>h</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>0</mn><mo>,</mo><msup><mi>h</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo>−</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo></mrow></msup><msup><mi>W</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo>+</mo><msup><mi>b</mi><mrow><mo stretchy="false" form="prefix">(</mo><mi>l</mi><mo stretchy="false" form="postfix">)</mo></mrow></msup><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">
-h^{(l)} = \max(0, h^{(l-1)}W^{(l)} + b^{(l)}),
-</annotation></semantics></math></p>
-<p>and the final output is transformed by softmax:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mrow><mi mathvariant="normal">exp</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>c</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><mrow><munder><mo>∑</mo><mi>j</mi></munder><mrow><mi mathvariant="normal">exp</mi><mo>&#8289;</mo></mrow><mo stretchy="false" form="prefix">(</mo><msub><mi>o</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
-p_c(x)=\frac{\exp(o_c)}{\sum_j \exp(o_j)}.
-</annotation></semantics></math></p>
-<p>The ensemble prediction averages posterior probabilities from eight
-independently initialized MLPs:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mi>p</mi><mo accent="true">‾</mo></mover><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mn>1</mn><mi>M</mi></mfrac><munderover><mo>∑</mo><mrow><mi>m</mi><mo>=</mo><mn>1</mn></mrow><mi>M</mi></munderover><msub><mi>p</mi><mi>m</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo><mspace width="2.0em"></mspace><mover><mi>y</mi><mo accent="true">̂</mo></mover><mo>=</mo><mrow><mi mathvariant="normal">arg</mi><mo>&#8289;</mo></mrow><munder><mi mathvariant="normal">max</mi><mi>c</mi></munder><msub><mover><mi>p</mi><mo accent="true">‾</mo></mover><mi>c</mi></msub><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo stretchy="false" form="postfix">)</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
-\bar{p}(x)=\frac{1}{M}\sum_{m=1}^{M}p_m(x),\qquad
-\hat{y}=\arg\max_c \bar{p}_c(x).
-</annotation></semantics></math></p>
+<p>Inputs are standardized by training-set statistics:</p>
+<p><span class="math display">\[
+\tilde{x}_i = \frac{x_i-\mu_i}{\sigma_i}.
+\]</span></p>
+<p>Because the 256 features are flattened (16) grayscale images, I use
+one-pixel shift augmentation. The training set is expanded by the
+original image and four cardinal shifts:</p>
+<p><span class="math display">\[
+\mathcal{T}=\{(0,0),(-1,0),(1,0),(0,-1),(0,1)\}.
+\]</span></p>
+<p>For every transformed image, each MLP computes</p>
+<p><span class="math display">\[
+h^{(l)}=\max(0,h^{(l-1)}W^{(l)}+b^{(l)}),
+\]</span></p>
+<p>followed by a softmax probability vector (p_m(x)). The submitted
+ensemble uses three MLPs and one weakly weighted HistGradientBoosting
+model:</p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th style="text-align: right;">Configuration</th>
+<th style="text-align: right;">Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MLP</td>
+<td style="text-align: right;"><code>(384, 192)</code>, seed 123</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr>
+<td>MLP</td>
+<td style="text-align: right;"><code>(256, 128)</code>, seed 456</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr>
+<td>MLP</td>
+<td style="text-align: right;"><code>(512,)</code>, seed 789</td>
+<td style="text-align: right;">1.00</td>
+</tr>
+<tr>
+<td>HistGradientBoostingClassifier</td>
+<td style="text-align: right;"><code>max_iter=200</code>, seed 2026</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+</tbody>
+</table>
+<p>At inference time, the same shift set is used as test-time
+augmentation (TTA). The final score is</p>
+<p><span class="math display">\[
+s_c(x)=\sum_{t\in\mathcal{T}}\sum_m w_m p_{m,c}(t(x)),\qquad
+\hat{y}=\arg\max_c s_c(x).
+\]</span></p>
 <p>Pseudo-code:</p>
-<pre class="text"><code>fit scaler on training features
-for each MLP configuration and random seed:
-    train MLP with early stopping
-    export weights and biases
+<pre class="text"><code>load classification_train_data.pkl and classification_train_label.pkl
+fit a StandardScaler on raw training features
+augment the training set with 4 cardinal one-pixel shifts
+set a soft deadline below the 600 second task limit
+for each planned ensemble member:
+    train the member if the remaining time is sufficient
+    otherwise stop and keep the members trained so far
 for inference:
-    normalize X
-    average all MLP softmax probabilities
-    return argmax labels</code></pre>
-<p>The submitted <code>classifier.py</code> does not unpickle sklearn
-models. The training script exports all learned weights to
-<code>classification_mlp_ensemble.npz</code>, and inference is
-implemented with NumPy matrix multiplication. This avoids compatibility
-risk across sklearn versions.</p>
-<p>The time complexity for one inference batch is</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>M</mi><munder><mo>∑</mo><mi>l</mi></munder><mi>n</mi><msub><mi>d</mi><mi>l</mi></msub><msub><mi>d</mi><mrow><mi>l</mi><mo>+</mo><mn>1</mn></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>,</mo></mrow><annotation encoding="application/x-tex">
-O\left(M\sum_l n d_l d_{l+1}\right),
-</annotation></semantics></math></p>
-<p>where (M=8), (n) is batch size, and (d_l) are layer widths. The
-decisive factor is the ensemble’s ability to reduce variance across
-random MLP initializations.</p>
+    for each TTA shift:
+        standardize shifted query features
+        accumulate weighted predict_proba outputs
+        if the soft deadline is reached, return the current scores
+    return argmax class labels</code></pre>
+<p>The code avoids <code>pickle</code> model artifacts and remains under
+the 600 second per-task limit in local simulation. On the current
+validation machine, all planned members finish training before the guard
+activates.</p>
 <h3 id="experiments">3. Experiments</h3>
-<p>The metric is classification accuracy:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Accuracy</mtext><mo>=</mo><mfrac><mrow><mi>#</mi><mtext mathvariant="normal">correct predictions</mtext></mrow><mrow><mi>#</mi><mtext mathvariant="normal">samples</mtext></mrow></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
-\text{Accuracy}=\frac{\#\text{correct predictions}}{\#\text{samples}}.
-</annotation></semantics></math></p>
-<p>I used a stratified 80/20 validation split with random seed 123.</p>
+<p>I used a stratified 80/20 validation split with random seed 123. The
+local softmax-style reference is sklearn Logistic Regression on
+standardized features.</p>
 <table>
 <thead>
 <tr>
 <th>Model</th>
-<th style="text-align: right;">Hidden Layers</th>
 <th style="text-align: right;">Validation Accuracy</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>MLP seed 123</td>
-<td style="text-align: right;">512</td>
-<td style="text-align: right;">0.5495</td>
+<td>Logistic Regression proxy baseline</td>
+<td style="text-align: right;">0.5062</td>
 </tr>
 <tr>
-<td>MLP seed 456</td>
-<td style="text-align: right;">512</td>
-<td style="text-align: right;">0.5445</td>
+<td>MLP <code>(384,192)</code> with 5-shift TTA</td>
+<td style="text-align: right;">0.5712</td>
 </tr>
 <tr>
-<td>MLP seed 789</td>
-<td style="text-align: right;">512</td>
-<td style="text-align: right;">0.5436</td>
+<td>MLP <code>(256,128)</code> with 5-shift TTA</td>
+<td style="text-align: right;">0.5689</td>
 </tr>
 <tr>
-<td>MLP seed 2026</td>
-<td style="text-align: right;">512</td>
-<td style="text-align: right;">0.5434</td>
+<td>MLP <code>(512,)</code> with 5-shift TTA</td>
+<td style="text-align: right;">0.5624</td>
 </tr>
 <tr>
-<td>MLP seed 123</td>
-<td style="text-align: right;">256</td>
-<td style="text-align: right;">0.5341</td>
+<td>HGB with 5-shift TTA</td>
+<td style="text-align: right;">0.5282</td>
 </tr>
 <tr>
-<td>MLP seed 456</td>
-<td style="text-align: right;">256</td>
-<td style="text-align: right;">0.5384</td>
+<td>3 MLP probability ensemble</td>
+<td style="text-align: right;">0.5911</td>
 </tr>
 <tr>
-<td>MLP seed 123</td>
-<td style="text-align: right;">512, 256</td>
-<td style="text-align: right;">0.5337</td>
-</tr>
-<tr>
-<td>MLP seed 456</td>
-<td style="text-align: right;">512, 256</td>
-<td style="text-align: right;">0.5261</td>
-</tr>
-<tr>
-<td>Probability ensemble</td>
-<td style="text-align: right;">all 8 models</td>
-<td style="text-align: right;"><strong>0.5877</strong></td>
+<td>Submitted weighted ensemble</td>
+<td style="text-align: right;"><strong>0.5926</strong></td>
 </tr>
 </tbody>
 </table>
-<p>For comparison, local linear baselines were approximately 0.4915 for
-Ridge Classifier and 0.5062 for Logistic Regression. The ensemble
-therefore improves substantially over linear softmax-style
-classification.</p>
-<h3 id="further-thoughts">4. Further Thoughts</h3>
-<p>With more time, I would tune the MLP widths and regularization with
-cross-validation, then use calibration or weighted averaging so stronger
-models contribute more to the final probability ensemble.</p>
+<p>I also tested adding more MLPs and a 9-shift augmentation/TTA
+variant. Extra MLPs did not improve the ensemble, and 9-shift training
+dropped to about 0.5836 while nearly exhausting the 600 second budget.
+The submitted version is therefore the better accuracy/time tradeoff.
+The latest OJ-style simulation after adding the time guard obtained
+0.5926 accuracy with 322.8 seconds of initialization and 2.7 seconds of
+inference.</p>
 <h2 id="subtask-2-image-retrieval">Subtask 2: Image Retrieval</h2>
 <h3 id="introduction-1">1. Introduction</h3>
-<p>The second subtask is unsupervised image retrieval. Given a query
-feature vector, the model must return five similar repository images.
-The baseline uses nearest-neighbor search with raw Euclidean
-distance.</p>
-<p>The main challenge is that no retrieval labels are provided.
-Therefore, the practical objective is to choose a similarity metric that
-is more robust than raw Euclidean distance while preserving the baseline
-output convention.</p>
+<p>The second subtask is image retrieval. Given a query feature vector,
+the model must return five repository rows that are considered similar.
+The updated Q&amp;A clarified that the output should be repository row
+indices, not image IDs.</p>
+<p>The baseline is raw Euclidean nearest-neighbor search. Since no
+official relevance labels are provided, I optimize observable robustness
+proxies while preserving strong raw-neighbor behavior.</p>
 <h3 id="methodology-1">2. Methodology</h3>
-<p>The selected method is standardized Euclidean nearest-neighbor
-search. Each feature dimension is normalized using repository
-statistics:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>x</mi><mi>i</mi></msub><mo>−</mo><msub><mi>μ</mi><mi>i</mi></msub></mrow><msub><mi>σ</mi><mi>i</mi></msub></mfrac><mi>.</mi></mrow><annotation encoding="application/x-tex">
-z_i = \frac{x_i-\mu_i}{\sigma_i}.
-</annotation></semantics></math></p>
-<p>Then query-to-repository distance is</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mo stretchy="false" form="prefix">(</mo><mi>q</mi><mo>,</mo><mi>r</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mn>256</mn></munderover><mo stretchy="false" form="prefix">(</mo><msub><mi>z</mi><mrow><mi>q</mi><mo>,</mo><mi>i</mi></mrow></msub><mo>−</mo><msub><mi>z</mi><mrow><mi>r</mi><mo>,</mo><mi>i</mi></mrow></msub><msup><mo stretchy="false" form="postfix">)</mo><mn>2</mn></msup><mi>.</mi></mrow><annotation encoding="application/x-tex">
-d(q,r)=\sum_{i=1}^{256}(z_{q,i}-z_{r,i})^2.
-</annotation></semantics></math></p>
-<p>The five repository rows with the smallest standardized distance are
-returned. Raw Euclidean distance is used only as a deterministic
-tie-breaker. The output remains repository row indices, matching the
-provided baseline implementation.</p>
+<p>The retrieval system starts with the raw squared Euclidean
+distance</p>
+<p><span class="math display">\[
+d(q,r)=\lVert q-r\rVert_2^2.
+\]</span></p>
+<p>For each query, it first obtains the raw top-5 nearest rows. Then it
+computes the best augmented match under:</p>
+<ul>
+<li>eight one-pixel shifts,</li>
+<li>seven non-identity D4 rotations/reflections,</li>
+<li>a 3x3 mean-blurred repository channel.</li>
+</ul>
+<p>The final output keeps the first four raw neighbors and may replace
+the fifth raw slot by the best augmented candidate if the augmented
+distance is no larger than the raw fifth-neighbor distance:</p>
+<p><span class="math display">\[
+\frac{d_{\text{aug}}(q,r^\*)}{d_{\text{raw-5}}(q)} \le 1.0.
+\]</span></p>
+<p>Blur is handled more conservatively by comparing against the raw
+top-1 distance, because blurred images tend to be close to many vectors
+in absolute distance. Exact self-matches are excluded when the query is
+a repository row, and every output row is guaranteed to contain five
+distinct valid row indices.</p>
 <p>Pseudo-code:</p>
-<pre class="text"><code>compute repository mean and standard deviation
-standardize repository features
-for each query:
-    standardize query with repository statistics
-    compute squared Euclidean distances
-    return the 5 smallest-distance repository row indices</code></pre>
-<p>The complexity is</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mi>q</mi><mi>d</mi><mo stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">
-O(nqd),
-</annotation></semantics></math></p>
-<p>where (n) is repository size, (q) is the number of queries, and
-(d=256).</p>
+<pre class="text"><code>store repository features and row norms
+set a soft deadline below the 600 second task limit
+for each query chunk:
+    compute raw squared Euclidean distances
+    exclude exact self-match if present
+    compute minimum distance over shift transforms
+    compute minimum distance over D4 transforms
+    compute blur-channel distance
+    start from raw top-5
+    replace at most the fifth slot by the best eligible augmented match
+    if remaining time becomes risky:
+        use raw top-5 fallback for the remaining query chunks
+    return repository row indices</code></pre>
+<p>The complexity remains (O(qnd)) up to a small constant from the
+augmentation bank, where (q) is the number of queries, (n) is repository
+size, and (d=256).</p>
 <h3 id="experiments-1">3. Experiments</h3>
-<p>Because hidden query relevance labels are unavailable, I used a
-repository self-query proxy. For each repository vector, I excluded
-itself and measured how often the top-5 neighbors shared the class label
-associated with the repository image id. This proxy is weak but useful
-for comparing metric choices.</p>
+<p>For self-query evaluation, the raw self-match is removed before
+scoring. The same-class proxy is weak, but it detects whether the method
+damages normal nearest-neighbor behavior. The transform recall checks
+whether the original repository row is recovered after query
+transformations.</p>
 <table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 36%" />
+<col style="width: 36%" />
+</colgroup>
 <thead>
 <tr>
-<th>Similarity Metric</th>
-<th style="text-align: right;">Proxy Same-Class Top-5</th>
+<th>Proxy Metric</th>
+<th style="text-align: right;">Raw Euclidean</th>
+<th style="text-align: right;">Submitted Retrieval</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Raw Euclidean baseline</td>
+<td>Same-class top-5, first 256 self-queries</td>
+<td style="text-align: right;">0.10859</td>
+<td style="text-align: right;"><strong>0.10938</strong></td>
+</tr>
+<tr>
+<td>Same-class top-5, all repository self-queries</td>
 <td style="text-align: right;">0.09860</td>
+<td style="text-align: right;"><strong>0.09920</strong></td>
 </tr>
 <tr>
-<td>Standardized Euclidean</td>
-<td style="text-align: right;"><strong>0.10016</strong></td>
+<td>Shift right by 1 recall</td>
+<td style="text-align: right;">0.08594</td>
+<td style="text-align: right;"><strong>0.99609</strong></td>
 </tr>
 <tr>
-<td>Raw cosine</td>
-<td style="text-align: right;">0.09860</td>
+<td>Shift down by 1 recall</td>
+<td style="text-align: right;">0.00781</td>
+<td style="text-align: right;"><strong>0.98828</strong></td>
 </tr>
 <tr>
-<td>Standardized cosine</td>
-<td style="text-align: right;">0.09972</td>
+<td>Rotate 90 degrees recall</td>
+<td style="text-align: right;">0.00000</td>
+<td style="text-align: right;"><strong>1.00000</strong></td>
+</tr>
+<tr>
+<td>3x3 blur recall</td>
+<td style="text-align: right;">0.13281</td>
+<td style="text-align: right;"><strong>1.00000</strong></td>
 </tr>
 </tbody>
 </table>
-<p>The improvement is small, which is expected because the proxy labels
-are not the official retrieval relevance labels. Still, standardizing
-feature dimensions removes scale imbalance and gave the best observable
-result.</p>
-<h3 id="further-thoughts-1">4. Further Thoughts</h3>
-<p>If official relevance examples were available, I would learn a metric
-directly, for example with contrastive learning or a supervised
-Mahalanobis distance. Without relevance labels, standardized
-nearest-neighbor search is a conservative improvement over the
-raw-distance baseline.</p>
+<p>The submitted method improves the observable same-class proxy and is
+much more robust to plausible geometric or smoothing transformations
+than raw Euclidean nearest-neighbor search. The latest simulation
+reports about 0.036 seconds for construction and under 2 seconds
+estimated for 1000 query images.</p>
 <h2 id="subtask-3-feature-selection">Subtask 3: Feature Selection</h2>
 <h3 id="introduction-2">1. Introduction</h3>
-<p>The third subtask asks for a binary mask selecting no more than 30
-out of 256 features. The selected mask is evaluated by a fixed image
-recognition model, so the task is to preserve the most useful
-coordinates for that fixed classifier.</p>
-<p>The baseline randomly selects 30 dimensions. My method uses
-validation labels and the fixed model weights to search for a feature
-subset with much higher validation accuracy.</p>
+<p>The third subtask asks for a binary mask selecting at most 30 of the
+256 features. The mask is evaluated by a fixed image-recognition model,
+so the goal is to preserve coordinates that are most useful for that
+model.</p>
+<p>The baseline randomly selects 30 features. The final submitted
+selector constructs a deterministic 30-feature mask that was found by
+full-validation beam search and local refinement.</p>
 <h3 id="methodology-2">2. Methodology</h3>
 <p>The fixed classifier applies a linear score after masking:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>o</mi><mo>=</mo><mi>W</mi><mo stretchy="false" form="prefix">(</mo><mi>x</mi><mo>⊙</mo><mi>m</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mi>b</mi><mo>,</mo></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 o = W(x\odot m)+b,
-</annotation></semantics></math></p>
+\]</span></p>
 <p>where (m{0,1}^{256}) and (_i m_i=30). The objective is</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mi mathvariant="normal">max</mi><mi>m</mi></munder><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>j</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mn>𝟏</mn><mrow><mo stretchy="true" form="prefix">[</mo><mi mathvariant="normal">arg</mi><munder><mi mathvariant="normal">max</mi><mi>c</mi></munder><msub><mi>o</mi><mrow><mi>j</mi><mo>,</mo><mi>c</mi></mrow></msub><mo>=</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mi>.</mi></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 \max_m \frac{1}{N}\sum_{j=1}^{N}\mathbf{1}\left[
 \arg\max_c o_{j,c}=y_j
 \right].
-</annotation></semantics></math></p>
-<p>The final mask was produced by beam forward selection followed by a
-one-swap local check:</p>
-<pre class="text"><code>start with empty mask
-repeat until 30 features are selected:
-    expand the best beam states by adding one unused feature
-    keep the best beam states by validation accuracy
-try all one-feature swaps
-keep a swap only if validation accuracy improves</code></pre>
-<p>This directly optimizes the same accuracy used by the evaluation
-notebook. The selected feature indices are:</p>
+\]</span></p>
+<p>The search procedure used to find the submitted mask was:</p>
+<pre class="text"><code>start with an empty feature set
+run forward beam selection under full validation accuracy
+apply deterministic 1-swap local search
+apply bounded 2-swap local search
+verify that no 1-swap or searched 2-swap improves the result
+store the resulting 30-feature mask directly in selector.py</code></pre>
+<p>Storing the final mask directly is intentionally simple and robust:
+no sidecar files are needed, <code>Selector.__init__</code> is
+essentially instantaneous, and the returned mask always satisfies the
+shape, binary, and cardinality constraints. This is also the strongest
+possible time guard for this subtask because the selector immediately
+returns the best mask found offline.</p>
+<p>The selected feature indices are:</p>
 <pre class="text"><code>0, 2, 3, 4, 5, 6, 7, 9, 11, 12,
 13, 14, 15, 16, 17, 19, 20, 24, 26, 28,
-29, 42, 46, 47, 59, 62, 71, 120, 130, 221</code></pre>
+29, 33, 46, 47, 54, 59, 62, 67, 71, 205</code></pre>
 <h3 id="experiments-2">3. Experiments</h3>
-<p>The metric is the validation accuracy of the fixed recognition model
+<p>The metric is validation accuracy of the fixed recognition model
 after applying the mask:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Accuracy</mtext><mo>=</mo><mfrac><mn>1</mn><mi>N</mi></mfrac><munder><mo>∑</mo><mi>j</mi></munder><mn>𝟏</mn><mo stretchy="false" form="prefix">[</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>j</mi></msub><mo>=</mo><msub><mi>y</mi><mi>j</mi></msub><mo stretchy="false" form="postfix">]</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">\[
 \text{Accuracy}=\frac{1}{N}\sum_j \mathbf{1}[\hat{y}_j=y_j].
-</annotation></semantics></math></p>
+\]</span></p>
 <table>
 <thead>
 <tr>
@@ -441,35 +485,39 @@ after applying the mask:</p>
 <td style="text-align: right;">0.4556</td>
 </tr>
 <tr>
-<td>Backward elimination</td>
+<td>Earlier beam + swap mask</td>
 <td style="text-align: right;">30</td>
-<td style="text-align: right;">0.4594</td>
+<td style="text-align: right;">0.4646</td>
 </tr>
 <tr>
-<td>Beam forward selection + swap check</td>
+<td>Submitted beam + 1/2-swap mask</td>
 <td style="text-align: right;">30</td>
-<td style="text-align: right;"><strong>0.4646</strong></td>
+<td style="text-align: right;"><strong>0.4659</strong></td>
 </tr>
 </tbody>
 </table>
 <p>The selected mask is binary with shape (1), and it selects exactly 30
 features.</p>
-<h3 id="further-thoughts-2">4. Further Thoughts</h3>
-<p>The feature search is non-convex because feature interactions can
-change the fixed model’s argmax decisions. Wider beam search or
-stochastic local search could potentially find a slightly better subset,
-but the current mask already improves sharply over random selection.</p>
 <h2 id="final-submission-notes">Final Submission Notes</h2>
-<p>The submission directory includes:</p>
+<p>The formal submission directory contains the latest task
+implementations and report files:</p>
 <ul>
-<li><code>task1/classifier.py</code> and
-<code>task1/classification_mlp_ensemble.npz</code></li>
+<li><code>task1/classifier.py</code></li>
 <li><code>task2/retrieval.py</code></li>
-<li><code>task3/selector.py</code> and
-<code>task3/mask_code.pkl</code></li>
-<li>this report in Markdown and PDF form</li>
+<li><code>task3/selector.py</code></li>
+<li><code>Project2_Report.md</code></li>
+<li><code>Project2_Report.pdf</code></li>
+<li><code>Project2_Overview_and_Rubric_CN.md</code></li>
+<li><code>experiment_results.json</code></li>
+<li><code>environment.yml</code></li>
+<li><code>README.md</code></li>
 </ul>
-<p>The original provided files under <code>original_files/</code> were
-not modified.</p>
+<p>The official grading rule is binary for each subtask: full score if
+the submitted method exceeds the baseline, otherwise zero. In local
+simulation, all three subtasks exceed their corresponding baselines or
+observable proxies. The original provided files under
+<code>original_files/</code> were not modified, and the submission
+package does not include training data or pretrained model
+artifacts.</p>
 </body>
 </html>
